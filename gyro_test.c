@@ -16,7 +16,7 @@ int main() {
     char iio_device_path[1000];
     printf("Enter the IIO device path: ");
     if (fgets(iio_device_path, sizeof(iio_device_path), stdin) == NULL) {
-        perror("Failed to read input");
+        perror("Failed to read input\n");
         exit(1);
     }
 
@@ -28,23 +28,24 @@ int main() {
 
     int iio_fd = open(iio_device_path, O_RDONLY);
     if (iio_fd < 0) {
-        perror("Failed to open IIO device");
+        perror("Failed to open IIO device\n");
         exit(1);
     }
-    printf("Opened IIO device");
+    printf("Opened IIO device\n");
 
-    char buffer[8];
+    char buffer[128];
     // Read Sensor Data
     int i = 0;
     bool notRead = true;
-    while (notRead && i < 100)
+    while (i < 100)
     {
         ssize_t num_bytes = read(iio_fd, buffer, sizeof(buffer));
         if (num_bytes < 0) {
-            perror("Failed to read sensor data");
+            perror("Failed to read sensor data\n");
         }
         else
         {
+            printf("read %ld bytes\n", num_bytes);
             notRead = false;
         }
         i++;
@@ -52,12 +53,12 @@ int main() {
 
     if (notRead)
     {
-        perror("exiting");
+        perror("exiting\n");
         close(iio_fd);
         exit(1);
     }
     
-    printf("Opened IIO device");
+    printf("Opened IIO device\n");
 
     // Interpret the raw data based on the LSM6DSx sensor data format and scaling
     // For example, if the data is 16-bit signed integers:
