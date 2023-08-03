@@ -42,12 +42,12 @@ int main() {
         ssize_t num_bytes = read(iio_fd, buffer, sizeof(buffer));
         if (num_bytes < 0) {
             perror("Failed to read sensor data");
-
         }
         else
         {
             notRead = false;
         }
+        i++;
     }
 
     if (notRead)
