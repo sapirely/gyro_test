@@ -16,6 +16,7 @@ int main() {
         perror("Failed to open IIO device");
         exit(1);
     }
+    printf("Opened IIO device");
 
     // Read Sensor Data
     char buffer[8];
@@ -25,12 +26,18 @@ int main() {
         close(iio_fd);
         exit(1);
     }
+    printf("Opened IIO device");
 
     // Interpret the raw data based on the LSM6DSx sensor data format and scaling
     // For example, if the data is 16-bit signed integers:
     int16_t gyro_x = (buffer[0] << 8) | buffer[1];
     int16_t gyro_y = (buffer[2] << 8) | buffer[3];
     int16_t gyro_z = (buffer[4] << 8) | buffer[5];
+
+    printf("RAW Gyroscope Data:\n");
+    printf("X-Axis: %x\n", gyro_x);
+    printf("Y-Axis: %x\n", gyro_y);
+    printf("Z-Axis: %d\n", gyro_z);
 
     // Apply scaling if necessary based on sensor data format and sensor datasheet
     // For example, to convert raw accelerometer data to meters per second squared:
