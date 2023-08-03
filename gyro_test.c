@@ -5,12 +5,27 @@
 #include <sys/ioctl.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
+
 
 #include <stdint.h>
 
 int main() {
     // Open Device
-    const char* iio_device_path = "/dev/iio:device0"; // 0 is gyro, 1 is accel
+    //const char* iio_device_path = "/dev/iio:device0"; // 0 is gyro, 1 is accel
+    char iio_device_path[1000];
+    printf("Enter the IIO device path: ");
+    if (fgets(iio_device_path, sizeof(iio_device_path), stdin) == NULL) {
+        perror("Failed to read input");
+        exit(1);
+    }
+
+    // Remove the trailing newline character from the input
+    size_t len = strlen(iio_device_path);
+    if (len > 0 && iio_device_path[len - 1] == '\n') {
+        iio_device_path[len - 1] = '\0';
+    }
+
     int iio_fd = open(iio_device_path, O_RDONLY);
     if (iio_fd < 0) {
         perror("Failed to open IIO device");
@@ -18,21 +33,40 @@ int main() {
     }
     printf("Opened IIO device");
 
-    // Read Sensor Data
     char buffer[8];
-    ssize_t num_bytes = read(iio_fd, buffer, sizeof(buffer));
-    if (num_bytes < 0) {
-        perror("Failed to read sensor data");
+    // Read Sensor Data
+    int i = 0;
+    bool notRead = true;
+    while (notRead && i < 100)
+    {
+        ssize_t num_bytes = read(iio_fd, buffer, sizeof(buffer));
+        if (num_bytes < 0) {
+            perror("Failed to read sensor data");
+
+        }
+        else
+        {
+            notRead = false;
+        }
+    }
+
+    if (notRead)
+    {
+        perror("exiting");
         close(iio_fd);
         exit(1);
     }
+    
     printf("Opened IIO device");
 
     // Interpret the raw data based on the LSM6DSx sensor data format and scaling
     // For example, if the data is 16-bit signed integers:
-    int16_t gyro_x = (buffer[0] << 8) | buffer[1];
-    int16_t gyro_y = (buffer[2] << 8) | buffer[3];
-    int16_t gyro_z = (buffer[4] << 8) | buffer[5];
+    int16_t gyro_x = buffer[0];
+    int16_t gyro_y = buffer[1];
+    int16_t gyro_z = buffer[2];
+    // int16_t gyro_x = (buffer[0] << 8) | buffer[1];
+    // int16_t gyro_y = (buffer[2] << 8) | buffer[3];
+    // int16_t gyro_z = (buffer[4] << 8) | buffer[5];
 
     printf("RAW Gyroscope Data:\n");
     printf("X-Axis: %x\n", gyro_x);
