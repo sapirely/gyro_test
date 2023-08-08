@@ -10,7 +10,18 @@
 
 #include <stdint.h>
 
+void printHexBuffer(const char* buffer, size_t size) {
+    for (size_t i = 0; i < size; i++) {
+        // Use %02X format specifier to ensure each byte is printed as two digits with leading zeros
+        printf("%02X ", (unsigned char)buffer[i]);
+    }
+    printf("\n");
+}
+
 int main() {
+
+    // BEFORE RUNNING THIS:
+    // enable the parameters and 
     // Open Device
     //const char* iio_device_path = "/dev/iio:device0"; // 0 is gyro, 1 is accel
     char iio_device_path[1000];
@@ -33,7 +44,7 @@ int main() {
     }
     printf("Opened IIO device\n");
 
-    char buffer[128];
+    char buffer[16];
     // Read Sensor Data
     int i = 0;
     bool notRead = true;
@@ -46,6 +57,7 @@ int main() {
         else
         {
             printf("read %ld bytes\n", num_bytes);
+            printHexBuffer(buffer, num_bytes);
             notRead = false;
         }
         i++;
@@ -62,6 +74,8 @@ int main() {
 
     // Interpret the raw data based on the LSM6DSx sensor data format and scaling
     // For example, if the data is 16-bit signed integers:
+
+    // TODO get the actual data  !!!!!!!!!!!!!!!!!!!!!!!
     int16_t gyro_x = buffer[0];
     int16_t gyro_y = buffer[1];
     int16_t gyro_z = buffer[2];
