@@ -110,6 +110,18 @@ int main() {
     printf("Y-Axis: %.2f\n", gyro_y_deg_per_s);
     printf("Z-Axis: %.2f\n", gyro_z_deg_per_s);
 
+    float acc_scale = 0.000598205; // in_accel_scale;
+    gyro_x_deg_per_s = gyro_x * acc_scale;
+    gyro_y_deg_per_s = gyro_y * acc_scale;
+    gyro_z_deg_per_s = gyro_z * acc_scale;
+
+    // Similarly, you can convert gyroscope data to degrees per second or radians per second based on the sensor datasheet.
+
+    printf("Accel Data (degrees/s):\n");
+    printf("X-Axis: %.2f\n", gyro_x_deg_per_s);
+    printf("Y-Axis: %.2f\n", gyro_y_deg_per_s);
+    printf("Z-Axis: %.2f\n", gyro_z_deg_per_s);
+
     close(iio_fd);
     return 0;
 
