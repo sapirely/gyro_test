@@ -45,7 +45,7 @@ int main() {
     printf("Opened IIO device\n");
 
     char buffer[16];
-    // Read Sensor Data
+    // Read Sensor Data - little endian
     int i = 0;
     bool notRead = true;
     while (i < 100)
@@ -76,21 +76,24 @@ int main() {
     // For example, if the data is 16-bit signed integers:
 
     // TODO get the actual data  !!!!!!!!!!!!!!!!!!!!!!!
-    int16_t gyro_x = buffer[0];
-    int16_t gyro_y = buffer[1];
-    int16_t gyro_z = buffer[2];
-    // int16_t gyro_x = (buffer[0] << 8) | buffer[1];
-    // int16_t gyro_y = (buffer[2] << 8) | buffer[3];
-    // int16_t gyro_z = (buffer[4] << 8) | buffer[5];
+    // int16_t gyro_x = buffer[0];
+    // int16_t gyro_y = buffer[1];
+    // int16_t gyro_z = buffer[2];
+    int16_t gyro_x = (buffer[1] << 8) | buffer[0];
+    int16_t gyro_y = (buffer[3] << 8) | buffer[2];
+    int16_t gyro_z = (buffer[5] << 8) | buffer[4];
 
     printf("RAW Gyroscope Data:\n");
     printf("X-Axis: %x\n", gyro_x);
     printf("Y-Axis: %x\n", gyro_y);
     printf("Z-Axis: %d\n", gyro_z);
 
+    // 0.000152716 = in_anglvel_scale
+
     // Apply scaling if necessary based on sensor data format and sensor datasheet
     // For example, to convert raw accelerometer data to meters per second squared:
-    float gyro_scale = 250 / (float)INT16_MAX; // // Assuming +/- 250 degrees/s range (16-bit signed integer range is -32768 to 32767)
+    //float gyro_scale = 250 / (float)INT16_MAX; // // Assuming +/- 250 degrees/s range (16-bit signed integer range is -32768 to 32767)
+    float gyro_scale = 0.000152716; // in_anglvel_scale;
     float gyro_x_deg_per_s = gyro_x * gyro_scale;
     float gyro_y_deg_per_s = gyro_y * gyro_scale;
     float gyro_z_deg_per_s = gyro_z * gyro_scale;
