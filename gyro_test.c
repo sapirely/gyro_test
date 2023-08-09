@@ -107,36 +107,6 @@ int main() {
         printDataWithScale(gyro_x, gyro_y, gyro_z, acc_scale, "accel");
     }
 
-/* gyro */
-//     // Apply scaling if necessary based on sensor data format and sensor datasheet
-//     // For example, to convert raw accelerometer data to meters per second squared:
-//     //float gyro_scale = 250 / (float)INT16_MAX; // // Assuming +/- 250 degrees/s range (16-bit signed integer range is -32768 to 32767)
-//     float gyro_scale = 0.000152716; // in_anglvel_scale;
-//     float gyro_x_deg_per_s = gyro_x * gyro_scale;
-//     float gyro_y_deg_per_s = gyro_y * gyro_scale;
-//     float gyro_z_deg_per_s = gyro_z * gyro_scale;
-
-//     // Similarly, you can convert gyroscope data to degrees per second or radians per second based on the sensor datasheet.
-
-//     printf("Gyroscope Data (degrees/s):\n");
-//     printf("X-Axis: %.2f\n", gyro_x_deg_per_s);
-//     printf("Y-Axis: %.2f\n", gyro_y_deg_per_s);
-//     printf("Z-Axis: %.2f\n", gyro_z_deg_per_s);
-// /////////////
-
-// /* accel */
-//     float acc_scale = 0.000598205; // in_accel_scale;
-//     gyro_x_deg_per_s = gyro_x * acc_scale;
-//     gyro_y_deg_per_s = gyro_y * acc_scale;
-//     gyro_z_deg_per_s = gyro_z * acc_scale;
-
-//     // Similarly, you can convert gyroscope data to degrees per second or radians per second based on the sensor datasheet.
-
-//     printf("Accel Data (degrees/s):\n");
-//     printf("X-Axis: %.2f\n", gyro_x_deg_per_s);
-//     printf("Y-Axis: %.2f\n", gyro_y_deg_per_s);
-//     printf("Z-Axis: %.2f\n", gyro_z_deg_per_s);
-/////////////////
     close(iio_fd);
     return 0;
 
