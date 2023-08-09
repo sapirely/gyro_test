@@ -83,9 +83,14 @@ int main() {
     int16_t gyro_y = (buffer[3] << 8) | buffer[2];
     int16_t gyro_z = (buffer[5] << 8) | buffer[4];
 
-    printf("RAW Gyroscope Data:\n");
+    printf("RAW Gyroscope Data: (HEX)\n");
     printf("X-Axis: %x\n", gyro_x);
     printf("Y-Axis: %x\n", gyro_y);
+    printf("Z-Axis: %x\n", gyro_z);
+
+    printf("RAW Gyroscope Data: (dec)\n");
+    printf("X-Axis: %d\n", gyro_x);
+    printf("Y-Axis: %d\n", gyro_y);
     printf("Z-Axis: %d\n", gyro_z);
 
     // 0.000152716 = in_anglvel_scale
