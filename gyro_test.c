@@ -7,6 +7,22 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include  <signal.h>
+
+static int iio_fd;
+static float gyro_scale = 0.000152716; // in_anglvel_scale;
+static float acc_scale = 0.000598205; // in_accel_scale;
+
+void sigintHandler(int sig) {
+    signal(sig, SIG_IGN);
+    printf("\nCaught Ctrl+C signal. Performing cleanup...\n");
+    // Add your cleanup code here
+    // Close files, release resources, etc.
+    
+    // Exit the program gracefully
+    close(iio_fd);
+    exit(EXIT_SUCCESS);
+}
 
 void printHexBuffer(const char* buffer, size_t size) {
     for (size_t i = 0; i < size; i++) {
@@ -23,10 +39,10 @@ void printDataWithScale(int16_t x, int16_t y, int16_t z, float scale, const char
     float z_deg = z * scale;
 
     printf("%s Data (degrees/s):\n", device_str);
-    printf("X-Axis: %.2f\n", x_deg);
-    printf("Y-Axis: %.2f\n", y_deg);
-    printf("Z-Axis: %.2f\n", z_deg);
+    printf("X-Axis: %.2f\tY-Axis: %.2f\tZ-Axis: %.2f\n", x_deg, y_deg, z_deg);
 }
+
+
 
 int main() {
 
@@ -35,6 +51,10 @@ int main() {
     // Open Device
     //const char* iio_device_path = "/dev/iio:device0"; // 0 is gyro, 1 is accel
     char iio_device_path[1000];
+    int16_t gyro_x, gyro_y, gyro_z;
+
+    signal(SIGINT, sigintHandler);
+
     printf("Enter the IIO device path: ");
     if (fgets(iio_device_path, sizeof(iio_device_path), stdin) == NULL) {
         perror("Failed to read input\n");
@@ -47,7 +67,7 @@ int main() {
         iio_device_path[len - 1] = '\0';
     }
 
-    int iio_fd = open(iio_device_path, O_RDONLY);
+    iio_fd = open(iio_device_path, O_RDONLY);
     if (iio_fd < 0) {
         perror("Failed to open IIO device\n");
         exit(1);
@@ -56,9 +76,10 @@ int main() {
 
     char buffer[16];
     // Read Sensor Data - little endian
-    int i = 0;
+    //int i = 0;
     bool notRead = true;
-    while (i < 100)
+    //while (i < 100)
+    while (true)
     {
         ssize_t num_bytes = read(iio_fd, buffer, sizeof(buffer));
         if (num_bytes < 0) {
@@ -66,11 +87,21 @@ int main() {
         }
         else
         {
-            printf("read %ld bytes\n", num_bytes);
-            printHexBuffer(buffer, num_bytes);
+            //printf("read %ld bytes\n", num_bytes);
+            //printHexBuffer(buffer, num_bytes);
+            // data is signed 16bit, little endian
+            gyro_x = (buffer[1] << 8) | buffer[0];
+            gyro_y = (buffer[3] << 8) | buffer[2];
+            gyro_z = (buffer[5] << 8) | buffer[4];
+            if (strstr(iio_device_path, "device0") != NULL) {
+                printDataWithScale(gyro_x, gyro_y, gyro_z, gyro_scale, "gyro");
+            } else {
+                printDataWithScale(gyro_x, gyro_y, gyro_z, acc_scale, "accel");
+            }
+            printf("X-raw: %d\tY-raw: %d\tZ-raw: %d\n", gyro_x, gyro_y, gyro_z);
             notRead = false;
         }
-        i++;
+        //i++;
     }
 
     if (notRead)
@@ -82,24 +113,19 @@ int main() {
     
     printf("Opened IIO device\n");
 
-    // data is signed 16bit, little endian
-    int16_t gyro_x = (buffer[1] << 8) | buffer[0];
-    int16_t gyro_y = (buffer[3] << 8) | buffer[2];
-    int16_t gyro_z = (buffer[5] << 8) | buffer[4];
+    // // data is signed 16bit, little endian
+    // int16_t gyro_x = (buffer[1] << 8) | buffer[0];
+    // int16_t gyro_y = (buffer[3] << 8) | buffer[2];
+    // int16_t gyro_z = (buffer[5] << 8) | buffer[4];
 
-    // printf("RAW Gyroscope Data: (HEX)\n");
-    // printf("X-Axis: %x\n", gyro_x);
-    // printf("Y-Axis: %x\n", gyro_y);
-    // printf("Z-Axis: %x\n", gyro_z);
-
-    printf("RAW Gyroscope Data: (dec)\n");
-    printf("X-Axis: %d\n", gyro_x);
-    printf("Y-Axis: %d\n", gyro_y);
-    printf("Z-Axis: %d\n", gyro_z);
+    // printf("RAW Gyroscope Data: (dec)\n");
+    // printf("X-Axis: %d\n", gyro_x);
+    // printf("Y-Axis: %d\n", gyro_y);
+    // printf("Z-Axis: %d\n", gyro_z);
 
     // 0.000152716 = in_anglvel_scale
-    float gyro_scale = 0.000152716; // in_anglvel_scale;
-    float acc_scale = 0.000598205; // in_accel_scale;
+    // float gyro_scale = 0.000152716; // in_anglvel_scale;
+    // float acc_scale = 0.000598205; // in_accel_scale;
 
     if (strstr(iio_device_path, "device0") != NULL) {
         printDataWithScale(gyro_x, gyro_y, gyro_z, gyro_scale, "gyro");
