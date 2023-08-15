@@ -28,7 +28,7 @@ void sigintHandler(int sig) {
     // Add your cleanup code here
     // Close files, release resources, etc.
 
-    printf("avReadTime = %luusec\n", totalReadTime/triesCnt);
+    printf("avReadTime = %lluusec\n", totalReadTime/triesCnt);
     
     // Exit the program gracefully
     close(iio_fd);
@@ -137,7 +137,7 @@ int main() {
     
     printf("Opened IIO device\n");
 
-    printf("avReadTime = %luusec\n", totalReadTime/triesCnt);
+    printf("avReadTime = %lluusec\n", totalReadTime/triesCnt);
 
     // // data is signed 16bit, little endian
     // int16_t gyro_x = (buffer[1] << 8) | buffer[0];
