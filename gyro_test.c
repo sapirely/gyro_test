@@ -8,16 +8,27 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include  <signal.h>
+#include <sys/time.h>
 
 static int iio_fd;
 static float gyro_scale = 0.000152716; // in_anglvel_scale;
 static float acc_scale = 0.000598205; // in_accel_scale;
+
+static struct timeval tvStart, tvEnd;
+static uint64_t totalReadTime = 0, readTime = 0, triesCnt=0;
+
+
+uint64_t TimeDiffUsec(struct timeval tvStart, struct timeval tvEnd){
+   return (1000000 * tvEnd.tv_sec + tvEnd.tv_usec) - (1000000 * tvStart.tv_sec + tvStart.tv_usec);
+}
 
 void sigintHandler(int sig) {
     signal(sig, SIG_IGN);
     printf("\nCaught Ctrl+C signal. Performing cleanup...\n");
     // Add your cleanup code here
     // Close files, release resources, etc.
+
+    printf("avReadTime = %luusec\n", totalReadTime/triesCnt);
     
     // Exit the program gracefully
     close(iio_fd);
@@ -79,14 +90,21 @@ int main() {
     //int i = 0;
     bool notRead = true;
     //while (i < 100)
+
     while (true)
     {
+        gettimeofday(&tvStart,NULL);
         ssize_t num_bytes = read(iio_fd, buffer, sizeof(buffer));
+        gettimeofday(&tvEnd,NULL);
+        readTime = TimeDiffUsec(tvStart, tvEnd);
+        totalReadTime+=readTime;
+        triesCnt++;
         if (num_bytes < 0) {
             perror("Failed to read sensor data\n");
         }
         else
         {
+            
             //printf("read %ld bytes\n", num_bytes);
             //printHexBuffer(buffer, num_bytes);
             // data is signed 16bit, little endian
@@ -101,6 +119,12 @@ int main() {
             printf("X-raw: %d\tY-raw: %d\tZ-raw: %d\n", gyro_x, gyro_y, gyro_z);
             notRead = false;
         }
+
+        if (triesCnt >= UINT64_MAX-1 || totalReadTime >= UINT64_MAX-1)
+        {
+            triesCnt = 0;
+            totalReadTime = 0;
+        }
         //i++;
     }
 
@@ -112,6 +136,8 @@ int main() {
     }
     
     printf("Opened IIO device\n");
+
+    printf("avReadTime = %luusec\n", totalReadTime/triesCnt);
 
     // // data is signed 16bit, little endian
     // int16_t gyro_x = (buffer[1] << 8) | buffer[0];
