@@ -118,15 +118,15 @@ static void shutdown(void)
 	printf("* Destroying buffers\n");
 	if (rxbuf) { iio_buffer_destroy(rxbuf); }
 
-	printf("* Disassociate trigger\n");
-	if (dev) {
-		ret = iio_device_set_trigger(dev, NULL);
-		if (ret < 0) {
-			char buf[256];
-			iio_strerror(-ret, buf, sizeof(buf));
-			fprintf(stderr, "%s while Disassociate trigger\n", buf);
-		}
-	}
+	// printf("* Disassociate trigger\n");
+	// if (dev) {
+	// 	ret = iio_device_set_trigger(dev, NULL);
+	// 	if (ret < 0) {
+	// 		char buf[256];
+	// 		iio_strerror(-ret, buf, sizeof(buf));
+	// 		fprintf(stderr, "%s while Disassociate trigger\n", buf);
+	// 	}
+	// }
 
 	printf("* Destroying context\n");
 	if (ctx) { iio_context_destroy(ctx); }
@@ -209,7 +209,7 @@ static void parse_options(int argc, char *argv[])
 int main (int argc, char **argv)
 {
 	// Hardware trigger
-	struct iio_device *trigger;
+	// struct iio_device *trigger;
 
 	parse_options(argc, argv);
 
@@ -259,22 +259,23 @@ int main (int argc, char **argv)
 			channels[i] = chn;
 	}
 
-	printf("* Acquiring trigger %s\n", trigger_str);
-	trigger = iio_context_find_device(ctx, trigger_str);
-	if (!trigger || !iio_device_is_trigger(trigger)) {
-		perror("No trigger found (try setting up the iio-trig-hrtimer module)");
-		shutdown();
-	}
+
+	// printf("* Acquiring trigger %s\n", trigger_str);
+	// trigger = iio_context_find_device(ctx, trigger_str);
+	// if (!trigger || !iio_device_is_trigger(trigger)) {
+	// 	perror("No trigger found (try setting up the iio-trig-hrtimer module)");
+	// 	shutdown();
+	// }
 
 	printf("* Enabling IIO streaming channels for buffered capture\n");
 	for (i = 0; i < channel_count; ++i)
 		iio_channel_enable(channels[i]);
 
-	printf("* Enabling IIO buffer trigger\n");
-	if (iio_device_set_trigger(dev, trigger)) {
-		perror("Could not set trigger\n");
-		shutdown();
-	}
+	// printf("* Enabling IIO buffer trigger\n");
+	// if (iio_device_set_trigger(dev, trigger)) {
+	// 	perror("Could not set trigger\n");
+	// 	shutdown();
+	// }
 
 	printf("* Creating non-cyclic IIO buffers with %d samples\n", buffer_length);
 	rxbuf = iio_device_create_buffer(dev, buffer_length, false);
