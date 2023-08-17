@@ -305,6 +305,8 @@ int main (int argc, char **argv)
 			shutdown();
 		}
 
+		printf("\n####nbytes_rx: %d\n", nbytes_rx);
+
 		p_inc = iio_buffer_step(rxbuf);
 		p_end = iio_buffer_end(rxbuf);
 
@@ -363,15 +365,15 @@ int main (int argc, char **argv)
 					shutdown();
 				}
 
-				printf("*****Buffer length: %d, total size: %zu*****\n", buffer_length, sample_size * buffer_length);
+				printf("\n*****Buffer length: %d, total size: %zu*****\n", buffer_length, sample_size * buffer_length);
 
 				if (buffer_read_method == CHANNEL_READ_RAW)
 					bytes = iio_channel_read_raw(channels[i], rxbuf, buf, sample_size * buffer_length);
 				else
 					bytes = iio_channel_read(channels[i], rxbuf, buf, sample_size * buffer_length);
 
-				printf("@@@@@@@ num of samples: %zu\n", bytes / sample_size);
-				printf("!!!!!!! num of bytes: %zu\n", bytes);
+				printf("\n@@@@@@@ num of samples: %zu\n", bytes / sample_size);
+				printf("\n!!!!!!! num of bytes: %zu\n", bytes);
 
 				printf("%s ", iio_channel_get_id(channels[i]));
 				for (sample = 0; sample < bytes / sample_size; ++sample) {
