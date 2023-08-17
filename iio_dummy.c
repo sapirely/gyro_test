@@ -363,6 +363,8 @@ int main (int argc, char **argv)
 					shutdown();
 				}
 
+				printf("*****Buffer length: %d, total size: %d", buffer_length, sample_size * buffer_length);
+
 				if (buffer_read_method == CHANNEL_READ_RAW)
 					bytes = iio_channel_read_raw(channels[i], rxbuf, buf, sample_size * buffer_length);
 				else
