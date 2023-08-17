@@ -277,7 +277,7 @@ int main (int argc, char **argv)
 	// 	shutdown();
 	// }
 
-	printf("* Creating non-cyclic IIO buffers with %d samples\n", buffer_length);
+	printf("* Creating non-cyclic IIO buffers with %d samples\n", buffer_length); // To change buffer length- run with flag -b
 	rxbuf = iio_device_create_buffer(dev, buffer_length, false);
 	if (!rxbuf) {
 		perror("Could not create buffer");
